@@ -1,0 +1,73 @@
+// Use the database
+use OnlineRetailStore;
+
+// Create Collections and insert sample documents
+db.Products.insertMany([
+  { ProductID: "P001", Name: "Laptop", Price: 999.99, Category: "Electronics", Stock: 50 },
+  { ProductID: "P002", Name: "Smartphone", Price: 499.99, Category: "Electronics", Stock: 100 },
+  // Add more products as needed
+]);
+
+db.Customers.insertMany([
+  { CustomerID: "C001", Name: "John Doe", Email: "john.doe@example.com" },
+  { CustomerID: "C002", Name: "Jane Smith", Email: "jane.smith@example.com" },
+  // Add more customers as needed
+]);
+
+db.Orders.insertMany([
+  { OrderID: "O001", CustomerID: "C001", OrderDate: new Date(), Status: "Pending", Total: 1499.98 },
+  { OrderID: "O002", CustomerID: "C002", OrderDate: new Date(), Status: "Shipped", Total: 499.99 },
+  // Add more orders as needed
+]);
+
+db.Categories.insertMany([
+  { CategoryID: "E01", Name: "Electronics" },
+  { CategoryID: "F01", Name: "Furniture" },
+  // Add more categories as needed
+]);
+
+db.OrderDetails.insertMany([
+  { OrderID: "O001", ProductID: "P001", Quantity: 1, Price: 999.99 },
+  { OrderID: "O001", ProductID: "P002", Quantity: 1, Price: 499.99 },
+  // Add more order details as needed
+]);
+db.Orders.find({ CustomerID: "C001" });
+db.Orders.updateOne(
+  { OrderID: "O001" },
+  { $set: { Status: "Paid" } }
+);
+db.Orders.deleteMany({ Status: "Canceled" });
+db.Products.find({
+  Category: "Electronics",
+  Price: { $gte: 100, $lte: 500 }
+});
+db.Products.find({
+  $and: [
+    { Stock: { $gt: 0 } },
+    { Price: { $gte: 100, $lte: 500 } }
+  ]
+});
+db.Products.find({
+  $or: [
+    { Stock: { $gt: 0 } },
+    { Price: { $gte: 100, $lte: 500 } }
+  ]
+});
+db.Products.find().sort({ Price: 1 });
+db.Products.find().sort({ Popularity: -1 });
+db.Orders.aggregate([
+  {
+    $group: {
+      _id: null,
+      averageOrderValue: { $avg: "$Total" }
+    }
+  }
+]);
+db.Orders.aggregate([
+  {
+    $group: {
+      _id: "$CustomerID",
+      orderCount: { $sum: 1 }
+    }
+  }
+]);
